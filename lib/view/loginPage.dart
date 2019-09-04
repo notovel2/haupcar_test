@@ -15,13 +15,13 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Center(
+      body: Center(
+        child: SafeArea(
           child: Stack(
             children: _buildStackWidgets(context),
           ),
         ),
-      ),
+      )
     );
   }
 
@@ -49,7 +49,15 @@ class _LoginPageState extends State<LoginPage> {
       child: Container(
         margin: EdgeInsets.all(10),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            Text(
+              "Welcome",
+              style: TextStyle(
+                fontSize: 30,
+                fontWeight: FontWeight.bold
+              ),
+            ),
             TextField(
               controller: _usernameController,
             ),
@@ -80,7 +88,7 @@ class _LoginPageState extends State<LoginPage> {
         print("error");
       })
       .catchError((error){
-      print("Error $error");
+        print("Error.onLogin: $error");
       })
       .whenComplete(() {
         print("complete");

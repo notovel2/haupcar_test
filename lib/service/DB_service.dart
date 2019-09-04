@@ -33,8 +33,8 @@ class DBService {
       _saveUsers(_users);
       return true;
     } catch (e) {
-      print(e);
-      throw ErrorDescription("Failed to add users");
+      print("dbservice.adduser: $e");
+      throw("Failed to add users");
     }
   }
 
@@ -45,7 +45,8 @@ class DBService {
       var hmacSha256 = Hmac(sha256, key);
       return hmacSha256.convert(bytes).toString();
     } catch (e) {
-      throw ErrorDescription("hmac convertion failed : $e");
+      print("dbservice.hmac: $e");
+      throw("hmac convertion failed : $e");
     }
   }
 
@@ -61,6 +62,7 @@ class DBService {
       File file = await _localFile;
       file.writeAsString(data);
     } catch (e) {
+      print("dbservice.write: $e");
     }
   }
 
@@ -70,8 +72,9 @@ class DBService {
       String contents = await file.readAsString();
       return contents;
     } catch (e) {
-      return "";
+      print("dbservice.write: $e");
     }
+    return "";
   }
 
   Future<String> get _localPath async {

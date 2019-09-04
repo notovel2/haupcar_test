@@ -1,4 +1,3 @@
-import 'package:flutter/widgets.dart';
 import 'package:haupcar_test/model/user.dart';
 import 'package:haupcar_test/service/DB_service.dart';
 
@@ -14,9 +13,9 @@ class AuthService {
         return user;
       }
     } catch (e) {
-      print(e);
+      print("erorr.login: $e");
     }
-    throw ErrorDescription("username or password is incorrect");
+    return Future.error("username or password is incorrect");
   }
 
   logout() async{
