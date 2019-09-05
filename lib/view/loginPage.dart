@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:haupcar_test/components/CustomTextField.dart';
+import 'package:haupcar_test/components/Loading.dart';
 import 'package:haupcar_test/service/auth_service.dart';
-import 'package:loading/indicator/ball_spin_fade_loader_indicator.dart';
-import 'package:loading/loading.dart';
+import 'package:haupcar_test/utils/Alert.dart';
+import 'package:haupcar_test/view/homePage.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -25,21 +27,11 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _buildLoading() {
-    return Center(
-      child: Container(
-        color: Colors.blueAccent.withOpacity(0.7),
-        padding: EdgeInsets.all(20),
-        child: Loading(indicator: BallSpinFadeLoaderIndicator(), size: 100.0,),
-      ),
-    );
-  }
-
   List<Widget> _buildStackWidgets(BuildContext context) {
     List<Widget> widgets = [];
     widgets.add(_buildLoginSection(context));
     if(_isLoading) {
-      widgets.add(_buildLoading());
+      widgets.add(LoadingIndicator());
     }
     return widgets;
   }
@@ -58,12 +50,14 @@ class _LoginPageState extends State<LoginPage> {
                 fontWeight: FontWeight.bold
               ),
             ),
-            TextField(
+            CustomTextField(
+              textAlign: TextAlign.center,
               controller: _usernameController,
             ),
-            TextField(
+            CustomTextField(
+              textAlign: TextAlign.center,
               controller: _passwordController,
-              obscureText: true,
+              isObsecure: true,
             ),
             RaisedButton(
               child: Text("Login"),
@@ -84,8 +78,13 @@ class _LoginPageState extends State<LoginPage> {
     AuthService.shared.login(username, password)
       .then((user){
         print("login success");
+        Navigator.pushReplacement(
+          context, 
+          MaterialPageRoute(builder: (context) => HomePage())
+        );
       }, onError: (error) {
         print("error");
+        ErrorHandler.showAlertDialog(context, error);
       })
       .catchError((error){
         print("Error.onLogin: $error");

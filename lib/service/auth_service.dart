@@ -6,6 +6,8 @@ class AuthService {
   Future<User> login(String username, String password) async{
     try {
       List<User> users = await DBService.shared.getUsers();
+      username = username.trim();
+      password = password.trim();
       User user = users.firstWhere((it) => it.username == username);
       String encrptedPassword = DBService.shared.hmac(password);
       if(user.password == encrptedPassword) {
@@ -18,8 +20,8 @@ class AuthService {
     return Future.error("username or password is incorrect");
   }
 
-  logout() async{
-
+  Future logout() async{
+    User.shared = null;
   }
 
 }

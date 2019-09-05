@@ -6,9 +6,18 @@ import 'package:haupcar_test/view/loginPage.dart';
 void main() => runApp(Main());
 
 class Main extends StatelessWidget {
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    // DBService.shared.removeUser("admin");
+    // DBService.shared.addUser(User(
+    //   userId: 1,
+    //   username: "admin",
+    //   password: "passw0rd",
+    //   name: "Admin",
+    //   lastName: "Manger",
+    //   email: "admin@manager.com",
+    //   activated: true
+    // ));
     return MaterialApp(
       title: 'User Management',
       theme: ThemeData(

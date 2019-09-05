@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:crypto/crypto.dart';
-import 'package:flutter/widgets.dart';
 import 'package:haupcar_test/model/user.dart';
 import 'package:path_provider/path_provider.dart';
   
@@ -16,15 +15,13 @@ class DBService {
     Map<String, dynamic> json = jsonDecode(contents);
     var userlist = json["users"];
     if(userlist is List) {
-      _users.addAll(
-        userlist.map((data) => User.fromJson(data))
-      );
+        _users = userlist.map((data) => User.fromJson(data)).toList();
       print("$userlist");
     }
     return users;
   }
 
-  addUser(User user) {
+  bool addUser(User user) {
     try {
       user.password = hmac(user.password);
       if(!_users.contains(user)) {
@@ -35,6 +32,17 @@ class DBService {
     } catch (e) {
       print("dbservice.adduser: $e");
       throw("Failed to add users");
+    }
+  }
+
+  bool removeUser(String username) {
+    try {
+      _users.removeWhere((userItem) => userItem.username == username);
+      _saveUsers(_users);
+      return true;
+    } catch (e) {
+      print("dbservice.removeuser: $e");
+      throw("Failed to remove users");
     }
   }
 
