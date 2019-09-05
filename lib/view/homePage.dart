@@ -16,7 +16,7 @@ class HomePage extends StatefulWidget{
 
 class _HomePageState extends State<HomePage> {
   bool _isLoading = false;
-
+  final _formKey = GlobalKey<FormState>();
   @override
   void initState() {
     widget.presenter.view = widget;
@@ -55,18 +55,14 @@ class _HomePageState extends State<HomePage> {
       IconButton(
         icon: Icon(Icons.power_settings_new),
         onPressed: (){
-          setState(() {
-            _isLoading = true;
-          });
-          AuthService.shared.logout()
+          _setLoading(true);
+          widget.presenter.logout(context)
             .then(
-              (res) => widget.presenter.routeToLoginPage(context), 
+              (res){}, 
               onError: (erorr) => print("Failed to logout")
             )
             .whenComplete(() {
-              setState(() {
-                _isLoading = false;
-              });
+              _setLoading(false);
             });
         },
       )
@@ -82,23 +78,48 @@ class _HomePageState extends State<HomePage> {
     return widgets;
   }
 
-  Widget _buildListSection(BuildContext context, List<User> users) {
-    return Container(
-      child: Card(
-        child: ListView(
-          children: _buildListViewItem(users),
+  Widget _buildDismissible(User user) {
+    // if(user.username == User.shared.username) {
+    //   return ListTile(
+    //     title: Text("${user.name} ${user.lastName}"),
+    //     subtitle: Text("@${user.username}"),
+    //   );
+    // }
+    return Dismissible(
+      direction: DismissDirection.endToStart,
+      background: Container(
+        margin: EdgeInsets.only(right: 5),
+        color: Colors.red,
+        alignment: Alignment.centerRight,
+        child: Icon(
+          Icons.delete,
+          color: Colors.white,
+          size: 40,
         ),
+      ),
+      key: Key(user.username),
+      onDismissed: (direction) {
+        widget.presenter.removeUser(user.username);
+      },
+      child: ListTile(
+        title: Text("${user.name} ${user.lastName}"),
+        subtitle: Text("@${user.username}"),
       ),
     );
   }
 
-  List<Widget> _buildListViewItem(List<User> users) {
-    return users.map<Widget>((user) =>
-      ListTile(
-        title: Text("${user.name} ${user.lastName}"),
-        subtitle: Text("@${user.username}"),
-      )
-    ).toList();
+  Widget _buildListSection(BuildContext context, List<User> users) {
+    return Container(
+      child: Card(
+        child: ListView.builder(
+          itemCount: users.length,
+          itemBuilder: (context, index) {
+            final user = users[index];
+            return _buildDismissible(user);
+          },
+        ),
+      ),
+    );
   }
 
   _showFormDialog() {
@@ -109,70 +130,98 @@ class _HomePageState extends State<HomePage> {
     final emailController = TextEditingController();
     showDialog(
       context: context,
-      barrierDismissible: true,
+      barrierDismissible: false,
       builder: (context) =>
       SimpleDialog(
-        title: Text("Add User"),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Text("Add User"),
+            IconButton(
+              icon: Icon(Icons.close),
+              onPressed: () => Navigator.of(context).pop(),
+            )
+          ],
+        ),
         children: <Widget>[
-          Container(
-            margin: EdgeInsets.symmetric(horizontal: 5),
-            child: Table(
-              // border: TableBorder.all(width: 1),
-              children: [
-                _buildTableRow(
-                  title: "Username",
+          Form(
+            key: _formKey,
+            child: Column(
+              children: <Widget>[
+                _buildTextFormField(
                   controller: usernameController,
+                  hintText: "Username"
                 ),
-                _buildTableRow(
-                  title: "Password",
+                _buildTextFormField(
                   controller: passwordController,
+                  hintText: "Password",
+                  obsecureText: true
                 ),
-                _buildTableRow(
-                  title: "Name",
+                _buildTextFormField(
                   controller: nameController,
+                  hintText: "Name",
                 ),
-                _buildTableRow(
-                  title: "Last name",
+                _buildTextFormField(
                   controller: lastnameController,
+                  hintText: "Last name"
                 ),
-                _buildTableRow(
-                  title: "E-mail",
+                _buildTextFormField(
                   controller: emailController,
+                  hintText: "E-mail"
                 ),
+                Container(
+                  margin: EdgeInsets.only(left: 5, right: 5),
+                  child: RaisedButton(
+                    child: Text("Save"),
+                    onPressed: () {
+                      if(_formKey.currentState.validate()) {
+                        print("valid !");
+                        _setLoading(true);
+                        widget.presenter.addUser(
+                          User(
+                            username: usernameController.text,
+                            password: passwordController.text,
+                            name: nameController.text,
+                            lastName: lastnameController.text,
+                            email: emailController.text
+                          )
+                        )
+                        .catchError((error) {
+                          print("$error");
+                        })
+                        .whenComplete((){
+                          Navigator.of(context).pop();
+                          _setLoading(false);
+                        });
+                      }
+                    },
+                  ),
+                )
+
               ],
             ),
           ),
-          Container(
-            margin: EdgeInsets.only(left: 5, right: 5),
-            child: RaisedButton(
-              child: Text("Save"),
-              onPressed: (){},
-            ),
-          )
+          
         ],
       )
     );
   }
 
-  TableRow _buildTableRow({
-    String title, 
-    bool isObsecure = false,
-    TextEditingController controller}) {
-    return TableRow(
-      children: [
-        TableCell(
-          verticalAlignment: TableCellVerticalAlignment.middle,
-          child: Text(title),
-        ),
-        TableCell(
-          verticalAlignment: TableCellVerticalAlignment.middle,
-          child: CustomTextField(
-            isObsecure: isObsecure,
-            controller: controller,
-            hintText: title,
-          ),
-        )
-      ]
+  _setLoading(bool isLoading) {
+    setState(() {
+      _isLoading = isLoading;
+    });
+  }
+
+  _buildTextFormField({
+    bool obsecureText = false,
+    @required TextEditingController controller,
+    String hintText,
+  }) {
+    return CustomTextFormField(
+      isObsecure: obsecureText,
+      controller: controller,
+      hintText: hintText,
     );
   }
 }

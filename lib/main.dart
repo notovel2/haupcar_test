@@ -18,6 +18,7 @@ class Main extends StatelessWidget {
     //   email: "admin@manager.com",
     //   activated: true
     // ));
+    DBService.shared.init();
     return MaterialApp(
       title: 'User Management',
       theme: ThemeData(

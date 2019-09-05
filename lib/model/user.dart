@@ -5,8 +5,7 @@ class User {
   User({
     @required this.username, 
     @required this.password,
-    @required this.userId,
-    this.activated = false,
+    this.activated = true,
     @required this.name,
     @required this.lastName,
     @required this.email});

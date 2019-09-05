@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class CustomTextField extends StatelessWidget {
-  CustomTextField({
+class CustomTextFormField extends StatelessWidget {
+  CustomTextFormField({
     @required this.controller,
     this.hintText,
     this.isObsecure = false,
@@ -17,16 +17,18 @@ class CustomTextField extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: (margin == null) ? EdgeInsets.all(10) : margin,
-      child: TextField(
+      child: TextFormField(
         textAlign: textAlign,
         obscureText: isObsecure,
         controller: controller,
+        validator: (value) => (value.isEmpty) ? "$hintText is required" : null,
         decoration: InputDecoration(
           contentPadding: EdgeInsets.all(10),
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(5)
+            // borderRadius: BorderRadius.circular(5),
+            borderSide: BorderSide()
           ),
-          hintText: hintText
+          labelText: hintText
         )
       ),
     );

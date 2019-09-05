@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:haupcar_test/components/CustomTextField.dart';
 import 'package:haupcar_test/components/Loading.dart';
+import 'package:haupcar_test/service/DB_service.dart';
 import 'package:haupcar_test/service/auth_service.dart';
 import 'package:haupcar_test/utils/Alert.dart';
 import 'package:haupcar_test/view/homePage.dart';
@@ -14,6 +15,19 @@ class _LoginPageState extends State<LoginPage> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isLoading = false;
+
+  @override
+  void initState() {
+    _isLoading = true;
+    DBService.shared.init()
+      .whenComplete(() {
+        this.setState(() {
+          _isLoading = false;
+        });
+      });
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -50,14 +64,16 @@ class _LoginPageState extends State<LoginPage> {
                 fontWeight: FontWeight.bold
               ),
             ),
-            CustomTextField(
+            CustomTextFormField(
               textAlign: TextAlign.center,
               controller: _usernameController,
+              hintText: "Username",
             ),
-            CustomTextField(
+            CustomTextFormField(
               textAlign: TextAlign.center,
               controller: _passwordController,
               isObsecure: true,
+              hintText: "Password",
             ),
             RaisedButton(
               child: Text("Login"),
